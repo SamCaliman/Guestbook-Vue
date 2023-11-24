@@ -6,64 +6,63 @@
           </div>
           <div class="w-1/2">
               <label for="nm">Nome:</label>
-              <input name="nm" type="text" placeholder="Nome" v-model="name" class="border border-gray-400 block py-2 px-4 w-full rounded focus:outline-none focus:border-teal-500">
+              <input name="nm" type="text" placeholder="Nome" v-model="Nuser.nome_usuario" class="border border-gray-400 block py-2 px-4 w-full rounded focus:outline-none focus:border-teal-500">
           </div>
           <div class="w-1/2">
               <label for="msg">Mensagem:</label>
-              <input name="msg" type="text" placeholder="Mensagem" v-model="message" class="border border-gray-400 block py-2 px-4 w-full rounded focus:outline-none focus:border-teal-500">
+              <input name="msg" type="text" placeholder="Mensagem" v-model="Nuser.comentario" class="border border-gray-400 block py-2 px-4 w-full rounded focus:outline-none focus:border-teal-500">
           </div>            
           <div>
-              <button @click="submitForm" class="bg-gray-600 px-2 border rounded text-gray-200">postar</button>
+              <button @click="send()" class="bg-gray-600 px-2 border rounded text-gray-200">postar</button>
           </div>
           <br>
-          <div v-for="u in user">
-                <p>{{u.nome_usuario}}</p>
-                <p>{{u.comentario}}</p>
+          <div v-for="u in res" class="bg-gray-300 p-2 rounded w-1/2">
+                <p>Usuário: {{u.nome_usuario}}</p>
+                <p>Comentario: {{u.comentario}}</p>
+                <p>Postado em: {{ u.createdAt }}</p>
           </div>
       </form>
   </body>
 
 </template>
-<script>
-import {ref} from 'vue'
-/*
+
+<script setup lang="ts">
+import {reactive, ref,onMounted} from 'vue'
+
 type user ={
   nome_usuario:string
   comentario:string
 }
-*/
-    export default{
-        /*
-        setup (){
-          const name = ref('')
-            
-          const submitForm = () => {
-              console.log(`Form submitted! Name = ${name.value}`)
-          }
-          return {
-              name,
-              submitForm,
-          }*/
-        data(){
-            return{
-                user:[]
-            }
-        }
-        methods:{
-            getPosts(){
-                fetch("http://localhost:3333/user")
-                .then(res => res.json())
-                .then(data => this.user = data)
-                .catch(err => console.log(err.message))
-            }
-        }
-        mounted(){
-            this.getPosts()
-        }
-          
-      }
-  
+    
+
+    const res = ref<user[]>([])
+
+    async function getPosts(){
+                const resultado = await fetch("http://localhost:3333/user")
+                const comentario = await resultado.json()
+                console.log(comentario)
+                res.value = comentario
+    }
+    const Nuser = reactive( {
+        nome_usuario: "",
+        comentario: ""
+    })
+    async function send() {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                },
+            body: JSON.stringify(Nuser),
+        }    
+        const response = await fetch("http://localhost:3333/user", options)
+    }
+    onMounted(async ()=>{
+    getPosts()
+    })
 </script>
+
+
 <style>
 
 </style>
