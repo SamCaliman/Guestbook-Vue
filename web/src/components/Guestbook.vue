@@ -33,8 +33,6 @@ type user ={
   nome_usuario:string
   comentario:string
 }
-    
-
     const res = ref<user[]>([])
 
     async function getPosts(){
